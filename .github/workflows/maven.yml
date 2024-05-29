@@ -15,8 +15,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,3 +28,14 @@ jobs:
         cache: maven
     - name: Run test with Maven
       run: mvn -B test --file pom.xml
+
+    synk:
+      needs: test
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/maven@master
+      continue-on-error: true # To make sure that SARIF upload gets called
+      env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
